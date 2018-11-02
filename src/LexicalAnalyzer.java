@@ -12,7 +12,7 @@ import java.util.List;
  **/
 public class LexicalAnalyzer {
 
-	public List<Token> analyzeAsSQL(String input){
+	public List<Token> analyzeAsSQL(String input) {
 		List<Token> ret = new ArrayList<>();
 
 		input.split("\\*");
@@ -20,13 +20,11 @@ public class LexicalAnalyzer {
 		return ret;
 	}
 
-	public List<Token> analyzeAsSQL(File txt){
+	public List<Token> analyzeAsSQL(File txt) {
 		Long fileLength = txt.length();
 		byte[] fileContent = new byte[fileLength.intValue()];
-		try {
-			FileInputStream in = new FileInputStream(txt);
+		try (FileInputStream in = new FileInputStream(txt)) {
 			in.read(fileContent);
-			in.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
@@ -34,7 +32,7 @@ public class LexicalAnalyzer {
 		return analyzeAsSQL(new String(fileContent, StandardCharsets.UTF_8));
 	}
 
-	public static void main(String args[]){
+	public static void main(String args[]) {
 		LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer();
 		File file = new File("." + File.separator + "resources" + File.separator + "input.txt");
 		lexicalAnalyzer.analyzeAsSQL(file);
