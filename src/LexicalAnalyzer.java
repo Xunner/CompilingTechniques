@@ -1,7 +1,5 @@
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * 词法分析器
@@ -12,29 +10,36 @@ import java.util.List;
  **/
 public class LexicalAnalyzer {
 
-	public List<Token> analyzeAsSQL(String input) {
+	/**
+	 * 分析SQL词法
+	 *
+	 * @param input SQL语句
+	 * @return 分析结果序列
+	 */
+	private List<Token> analyzeAsSQL(String input) {
 		List<Token> ret = new ArrayList<>();
 
-		input.split("\\*");
+//		System.out.println(input);
 
+		DfaLoader.tranDFA();
+		DFA dfa = DfaLoader.loadDFA();
 		return ret;
 	}
 
-	public List<Token> analyzeAsSQL(File txt) {
-		Long fileLength = txt.length();
-		byte[] fileContent = new byte[fileLength.intValue()];
-		try (FileInputStream in = new FileInputStream(txt)) {
-			in.read(fileContent);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-		return analyzeAsSQL(new String(fileContent, StandardCharsets.UTF_8));
+	/**
+	 * 分析SQL词法
+	 *
+	 * @param txt SQL文本
+	 * @return 分析结果序列
+	 */
+	private List<Token> analyzeAsSQL(File txt) {
+		return analyzeAsSQL(DfaLoader.readFile(txt));
 	}
+
 
 	public static void main(String args[]) {
 		LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer();
-		File file = new File("." + File.separator + "resources" + File.separator + "input.txt");
-		lexicalAnalyzer.analyzeAsSQL(file);
+		File file = new File(DfaLoader.PATH + "input.txt");
+		System.out.println(lexicalAnalyzer.analyzeAsSQL(file));
 	}
 }
