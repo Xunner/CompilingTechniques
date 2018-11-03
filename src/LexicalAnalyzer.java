@@ -111,14 +111,16 @@ public class LexicalAnalyzer {
 	public static void main(String args[]) {
 		new DFALoader().generateDFA();
 		LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer();
+		System.out.println("<Token类型, 符号>");
+		System.out.println("-----------------");
 		for (Token token : lexicalAnalyzer.analyzeAsSQL(SLUtil.readFile("input.txt"))) {
-			if (token.type == TokenType.ERROR) {
-				System.out.println("错误！无法识别：\"" + token.value + '"');
-			} else if (token.type == TokenType.COMMENT) {
-				System.out.println("剔除注释：" + token.value);
-			} else {
+//			if (token.type == TokenType.ERROR) {
+//				System.out.println("错误！无法识别：\"" + token.value + '"');
+//			} else if (token.type == TokenType.COMMENT) {
+//				System.out.println("剔除注释：" + token.value);
+//			} else {
 				System.out.println(token);
-			}
+//			}
 		}
 	}
 }
