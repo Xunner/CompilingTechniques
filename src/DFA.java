@@ -10,21 +10,35 @@ import java.util.Set;
  * @author 巽
  **/
 public class DFA implements Serializable {
-	private String startState;
-	private String state;
-	private Map<String, Map<String, String>> table;
-	private Set<String> endStates;
+	private String startState;  // 初始状态
+	private String state;   // 当前状态，空串""代表不存在的转换到达的不存在的状态
+	private Map<String, Map<String, String>> table; // 转换表
+	private Set<String> endStates;  // 终态集合
 
-	public DFA(Map<String, Map<String, String>> table, Set<String> endStates, String startState){
+	DFA(Map<String, Map<String, String>> table, Set<String> endStates, String startState) {
 		this.table = table;
 		this.endStates = endStates;
 		this.startState = startState;
 		this.state = startState;
 	}
 
-	public String transform(String in){
-		state = table.get(state).getOrDefault(in, "");
-		return state;
+	String transform(char c) {
+		String next = table.get(state).getOrDefault(String.valueOf(c), "");
+		if (!next.isEmpty()) {
+			state = next;
+		}
+		return next;
+	}
+
+	boolean isEndState() {
+		return endStates.contains(state);
+	}
+
+	/**
+	 * 重置为初始状态
+	 */
+	void reset() {
+		state = startState;
 	}
 
 	@Override

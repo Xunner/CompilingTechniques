@@ -1,4 +1,6 @@
-select * from orders where id=1;
+select * from orders o where id=1 and o.name ="126"and o.value=names
+order by sum(cost) desc; # mysql is the best
 /* 1//*\/ */
 # 3
-
+6.;
+#single line comment

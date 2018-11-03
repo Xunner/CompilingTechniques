@@ -1,16 +1,14 @@
-import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
- * DFA加载器，可以读取手写的DFA.txt并转换为DFA转换表存起来，可以加载DFA转换表
+ * DFA加载器，可以读取手写的转换表DFA.txt并转换为DFA存起来，可以加载DFA
  * <br>
  * created on 2018/11/02
  *
  * @author 巽
  **/
-class DfaLoader {
-	static String PATH = "." + File.separator + "resources" + File.separator;
+class DFALoader {
+	private static String dfaFileName = "dfa.ser";
 	/** 字符全集 */
 	private Set<String> as = new HashSet<>();
 	/** \w集合 */
@@ -20,7 +18,7 @@ class DfaLoader {
 	/** 自定义\z集合，等价于[a-zA-Z_] */
 	private Set<String> zs = new HashSet<>();
 
-	public DfaLoader() {
+	DFALoader() {
 		// ds=\d
 		for (int i = 0; i < 10; i++) {
 			ds.add(String.valueOf(i));
@@ -43,39 +41,17 @@ class DfaLoader {
 		}
 		as.add("\t");
 		as.add("\n");
+	}
 
-//		System.out.println("ds: " + ds);
-//		System.out.println("zs: " + zs);
-//		System.out.println("ws: " + ws);
-//		System.out.println("as: " + as);
-
-//		Set<String> tmp = new HashSet<>(ds);
+	static DFA loadDFA() {
+		return (DFA) SLUtil.loadObject(dfaFileName);
 	}
 
 	/**
-	 * 读取文本，默认编码UTF-8
-	 *
-	 * @param file 文本名
-	 * @return 整个文本
+	 * 根据手写的转换表DFA.txt生成DFA，并存起来
 	 */
-	static String readFile(File file) {
-		Long fileLength = file.length();
-		byte[] fileContent = new byte[fileLength.intValue()];
-		try (FileInputStream in = new FileInputStream(file)) {
-			int read = in.read(fileContent);
-			assert read == -1;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return "";
-		}
-		return new String(fileContent, StandardCharsets.UTF_8);
-	}
-
-	/**
-	 * 读取手写的DFA.txt转换表并转换为DFA存起来
-	 */
-	void tranDFA() {
-		String dfaTable = readFile(new File(PATH + "dfaTable.txt"));
+	void generateDFA() {
+		String dfaTable = SLUtil.readFile("dfaTable.txt");
 
 		Map<String, Map<String, String>> table = new HashMap<>();
 		String startState = "";
@@ -107,6 +83,9 @@ class DfaLoader {
 									map.put(character, right);
 								}
 								break;
+							case 'n':
+								map.put(String.valueOf('\n'), right);
+								break;
 							case 'z':
 								for (String character : zs) {
 									map.put(character, right);
@@ -130,10 +109,10 @@ class DfaLoader {
 		}
 
 		DFA dfa = new DFA(table, endStates, startState);
-		saveDFA(dfa);
+		SLUtil.saveObject(dfa, dfaFileName);
 	}
 
-	private Set<String> analyzeBracket(String s){
+	private Set<String> analyzeBracket(String s) {
 		s = s.substring(1, s.length() - 1);    // 去掉首尾的'['、']'
 		Set<String> chars = new HashSet<>();
 		if (s.charAt(0) == '^') {  // 处理[^...]形式
@@ -157,29 +136,5 @@ class DfaLoader {
 			}
 		}
 		return chars;
-	}
-
-	private static void saveDFA(DFA dfa) {
-		try (ObjectOutputStream oos = new ObjectOutputStream(
-				new FileOutputStream(new File(PATH + "dfa.txt"), false))) {
-			oos.writeObject(dfa);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * 加载DFA转换表
-	 *
-	 * @return DFA转换表
-	 */
-	static DFA loadDFA() {
-		try (ObjectInputStream ois = new ObjectInputStream(
-				new FileInputStream(new File(PATH + "dfa.txt")))) {
-			return (DFA) ois.readObject();
-		} catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 }
