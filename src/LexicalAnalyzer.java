@@ -19,10 +19,14 @@ public class LexicalAnalyzer {
 	private List<Token> analyzeAsSQL(String input) {
 		List<Token> ret = new ArrayList<>();
 
-//		System.out.println(input);
+//		for(char c : input.toCharArray()){
+//
+//		}
 
-		DfaLoader.tranDFA();
+		new DfaLoader().tranDFA();
 		DFA dfa = DfaLoader.loadDFA();
+		System.out.println(dfa);
+
 		return ret;
 	}
 
