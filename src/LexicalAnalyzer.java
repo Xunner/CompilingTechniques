@@ -23,27 +23,25 @@ public class LexicalAnalyzer {
 	 * @return 分析结果序列
 	 */
 	private List<Token> analyzeAsSQL(String input) {
-		List<Token> ret = new ArrayList<>();
-
-		new DFALoader().generateDFA();
 		DFA dfa = DFALoader.loadDFA();
 		assert dfa != null;
 
 		dfa.reset();
+		List<Token> ret = new ArrayList<>();
 		StringBuilder match = new StringBuilder();  // 当前匹配串
-		input = input + END_SYMBOL;
-//		System.out.println(input);
+		input = input + END_SYMBOL; // 添加哨兵结束标记
 		for (int i = 0; i < input.length(); i++) {
 			String state = dfa.transform(input.charAt(i));
 			if (state.isEmpty()) {   // 若匹配已停止
 				if (dfa.isEndState()) {   // 已匹配成功
 					ret.add(matchSQLToken(match.toString()));
 					i--;    // 从当前字符开始新的匹配
-				} else {    // 若匹配失败
-//					System.out.println("匹配失败：'" + match.toString()
-//							+ "', 当前字符：'" + (input.charAt(i) < 32 ? "\\" + (int) input.charAt(i) : input.charAt(i))
-//							+ "', 最后状态：" + dfa.getState());
-					i -= match.length();    // 从已匹配串的第二个字符重新开始匹配
+				} else if (match.length() > 0){    // 若匹配失败
+					ret.add(new Token(TokenType.ERROR, match.toString()));
+					i--;    // 从当前字符开始新的匹配
+
+//					System.out.println("跳过字符：'" + (input.charAt(i) < 32 ?
+//							"\\" + (int) input.charAt(i) : input.charAt(i)) + "'");
 				}
 				match.setLength(0); // 清空
 				dfa.reset();
@@ -111,9 +109,16 @@ public class LexicalAnalyzer {
 
 
 	public static void main(String args[]) {
+		new DFALoader().generateDFA();
 		LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer();
 		for (Token token : lexicalAnalyzer.analyzeAsSQL(SLUtil.readFile("input.txt"))) {
-			System.out.println(token);
+			if (token.type == TokenType.ERROR) {
+				System.out.println("错误！无法识别：\"" + token.value + '"');
+			} else if (token.type == TokenType.COMMENT) {
+				System.out.println("剔除注释：" + token.value);
+			} else {
+				System.out.println(token);
+			}
 		}
 	}
 }

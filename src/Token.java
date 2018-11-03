@@ -6,8 +6,8 @@
  * @author 巽
  **/
 public class Token {
-	private TokenType type;
-	private String value;
+	TokenType type; // 单词类型
+	String value;   // 单词的值
 
 	Token(TokenType type, String value) {
 		this.type = type;

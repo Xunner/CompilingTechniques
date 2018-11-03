@@ -6,7 +6,8 @@
  * @author 巽
  **/
 public enum TokenType {
-	RESERVED_WORD("pres"), IDENTIFIER("id"), STRING("str"), COMMENT("com"), NUMBER("num"), OPERATOR("op"), SEPARATOR("sep");
+	RESERVED_WORD("pres"), IDENTIFIER("id"), STRING("str"), COMMENT("com"), NUMBER("num"), OPERATOR("op"),
+	SEPARATOR("sep"), ERROR("error");
 
 	String value;
 

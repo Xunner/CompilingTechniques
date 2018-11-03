@@ -1,4 +1,4 @@
-# CompilingTechniques
+# Compiling Techniques Lab
 
 ## Motivation/Aim
 
@@ -97,11 +97,47 @@
 
 ## Description of important Data Structures
 
+### DFA
+
+```java
+public class DFA implements Serializable {
+	private String startState;  // 初始状态
+	private String state;   // 当前状态，空串""代表不存在的转换到达的不存在的状态
+	private Map<String, Map<String, String>> table; // 转换表：Map<current_state, Map<input_char, next_state>>
+	private Set<String> endStates;  // 终态集合
+}
+```
+
+​	有限自动状态机类，可以接受输入尝试进行转换，判断当前状态是否为终态。对于不合法的串不会存在对应转换（自动机状态不变，返回特殊提示）。
+
+### Token
+
+```java
+public class Token {
+	TokenType type; // 单词类型，如保留字、数字
+	String value;   // 单词的值，如"select"、"123"
+}
+```
+
+​	单词类，即词法分析出的单词。
+
+​	另：单词类型包括注释（COMMENT）和错误（ERROR），这两类“单词”留待词法分析结束后删去或由语法分析器处理。
+
 ## Description of core Algorithms
+
+1. 词法分析器（LexicalAnalyzer类）从头扫描输入流，逐一输入有限状态机；
+2. DFA类提示不存在的转换后，检查其是否处于终态，是则匹配到合法串，生成Token，否则生成错误Token（错误串）或直接跳过（空白字符）；
+3. 重置DFA，继续输入直至结束。
 
 ## Use cases on running
 
+​	参见resources文件夹中的input.txt
+
 ## Problems occurred and related solutions
+
+1. 识别过程中的空白字符和错误串处理问题：当前匹配串为空串时直接跳过，否则用其生成错误（ERROR）类型的Token，加入返回Token序列；之后从当前字符开始新的匹配。
+2. 字符全集较大（共97个字符）导致的手写DFA困难：以``[abc]→state``的形式简写转换，使用`\w`、`\d`等标记，写程序处理成真正的DFA转换表。详见DFALoader类和dfa_table.txt。
 
 ## Your feelings and comments
 
+​	计算机届的前辈们为了通用性和执行效率做出了太多努力；我们一直站在巨人的肩膀上。

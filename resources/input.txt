@@ -1,6 +1,9 @@
 select * from orders o where id=1 and o.name ="126"and o.value=names
-order by sum(cost) desc; # mysql is the best
-/* 1//*\/ */
-# 3
-6.;
-#single line comment
+order by sum(cost) desc; # single line comment
+/* mysql is the best //*\/ */*/
+
+use tmp_database;
+select count(*) from orders o1 where user_type="vip" and not exists(
+	select null from orders o2 where o2.id =o1.id and o1.date>o2.date);
+
+66.; # an error

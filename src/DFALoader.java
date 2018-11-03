@@ -51,7 +51,7 @@ class DFALoader {
 	 * 根据手写的转换表DFA.txt生成DFA，并存起来
 	 */
 	void generateDFA() {
-		String dfaTable = SLUtil.readFile("dfaTable.txt");
+		String dfaTable = SLUtil.readFile("dfa_table.txt");
 
 		Map<String, Map<String, String>> table = new HashMap<>();
 		String startState = "";
