@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -12,8 +11,7 @@ public class SyntaxAnalyzer {
 	private final static String ACCEPT = "acc";
 	private final static String END = "$";
 	private String startState;
-	private Map<String, Map<String, String>> action = new HashMap<>(); // ACTION表：Map<current_state, Map<input_token, action>>
-	private Map<String, Map<String, String>> gotoTable = new HashMap<>(); // GOTO表：Map<current_state, Map<top, goto>>
+	private Map<String, Map<String, String>> analysis = new HashMap<>(); // 分析表：Map<current_state, Map<input_token, analysis>>
 	private String[] syntaxes;
 	private Stack<String> stack = new Stack<>();
 
@@ -24,7 +22,6 @@ public class SyntaxAnalyzer {
 		for (int i = 0; i < head.length; i++) {
 			head[i] = head[i].trim();
 		}
-		System.out.println(Arrays.toString(head));
 		for (int i = 2; i < lines.length; i++) {
 			String[] blocks = lines[i].split("\\|");
 			String state = blocks[1].trim();
@@ -32,43 +29,38 @@ public class SyntaxAnalyzer {
 				startState = state;
 			}
 			Map<String, String> actions = new HashMap<>();
-			Map<String, String> gotos = new HashMap<>();
 			for (int j = 2; j < blocks.length; j++) {
 				String movement = blocks[j].trim();
 				if (!movement.isEmpty()) {
 					if (movement.equals(ACCEPT)) {
 						actions.put(head[j], movement);
 					} else if (movement.charAt(0) == 's') {
-						actions.put(head[j], movement.substring(1));
+						actions.put(head[j], movement);
 					} else if (movement.charAt(0) == 'r') {
-						gotos.put(head[j], movement.substring(1));
+						actions.put(head[j], movement);
 					} else {
 						System.out.println("ERROR IN ANALYSIS  TABLE: " + movement);
 					}
 				}
 			}
-			action.put(state, actions);
-			gotoTable.put(state, gotos);
+			analysis.put(state, actions);
 		}
-		System.out.println(action);
+//		System.out.println("analysis: " + analysis);
 		// 加载语法
 		syntaxes = SLUtil.readFile(syntaxFileName).split(System.getProperty("line.separator"));
-		System.out.println(Arrays.toString(syntaxes));
+//		System.out.println("syntaxes: " + Arrays.toString(syntaxes));
 	}
 
 	private void analyzeAsSQL(List<Token> tokens) {
 		// 初始化
 		stack.clear();
 		stack.push(startState);
-//		System.out.println("<Token类型, 符号>");
-//		System.out.println("-----------------");
+		boolean isAccepted = false;
+		tokens.add(new Token(TokenType.RESERVED_WORD, END));    // 加上终止符
+		System.out.println("选择第三种输出方法：规约序列");
+		System.out.println(String.format("%-31s", "reduction sequence") + "stack translation");
 		for (Token token : tokens) {
-			if (token.type == TokenType.ERROR) {
-				System.out.println("错误！无法识别：\"" + token.value + '"');
-			} else if (token.type == TokenType.COMMENT) {
-				System.out.println("剔除注释：" + token.value);
-			} else {
-				boolean isAccepted;
+			if (token.type != TokenType.ERROR && token.type != TokenType.COMMENT) {
 				try {
 					isAccepted = move(stack.peek(), token);
 				} catch (Exception e) {
@@ -79,17 +71,21 @@ public class SyntaxAnalyzer {
 					}
 					return;
 				}
-				if (isAccepted) {
-					break;
-				}
-//				System.out.println(token);
 			}
 		}
-
+		if (isAccepted) {
+			System.out.println("接受，分析成功，是合法语法");
+		}
 	}
 
 	private boolean move(String top, Token token) throws Exception {
-		String movement = action.get(top).get(token.value);
+//		System.out.println("stack=" + stack);
+//		System.out.println("current token=" + token);
+		String movement = analysis.get(top).get(token.value);
+//		System.out.println("movement=" + movement);
+		if (movement == null) {
+			movement = analysis.get(top).get(token.type.value);
+		}
 		if (movement == null) {   // 报错
 			throw new Exception("not a legal syntax at: \n\tstack=" + stack + "\n\tcurrent token=" + token);
 		} else if (movement.equals(ACCEPT)) {    // 接受
@@ -99,8 +95,17 @@ public class SyntaxAnalyzer {
 			return false;
 		} else if (movement.charAt(0) == 'r') {   // 规约
 			String reduction = syntaxes[Integer.valueOf(movement.substring(1))];
-			System.out.println(reduction);
-			return false;
+			String[] sides = reduction.split("→");
+			String nonTerminal = sides[0];
+			String[] states = sides[1].split(" ");
+			System.out.print(String.format("%-30s", reduction) + stack);
+			for (String ignored : states) {
+				stack.pop();
+			}
+			System.out.println(" → " + stack);
+//			System.out.println(reduction + " | " + stack.peek());
+			stack.push(analysis.get(stack.peek()).get(nonTerminal).substring(1));
+			return move(stack.peek(), token);
 		} else { // 异常
 			throw new Exception("ERROR WHILE ANALYZING: \n\t" + "stack=" + stack + "\n\tcurrent token=" + token);
 		}

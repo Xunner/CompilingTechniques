@@ -1,7 +1,5 @@
-select * from orders o where id=1 and o.name ="126"and o.value=names; # single line comment
-/* mysql is the best //*\/ */*/
+select oid from orders o where id=1 and name ="126"and value=names; # single line comment
+/* mysql is the best //*\/ */
 
-select count(*) from orders o where user_type="vip";
-select null from orders o, product p where o.pid =p.pid;
-
-66.; # an error
+select count(odate) from orders o where user_type="vip";
+select oid, odate, total from orders o, product p where pid =pid
