@@ -10,10 +10,10 @@ import java.util.*;
 public class SyntaxAnalyzer {
 	private final static String ACCEPT = "acc";
 	private final static String END = "$";
-	private String startState;
+	private String startState;	// 初始状态
 	private Map<String, Map<String, String>> analysis = new HashMap<>(); // 分析表：Map<current_state, Map<input_token, analysis>>
-	private String[] syntaxes;
-	private Stack<String> stack = new Stack<>();
+	private String[] syntaxes;	// 文法集合
+	private Stack<String> stack = new Stack<>();	// 状态序列栈
 
 	private SyntaxAnalyzer(String analysisFileName, String syntaxFileName) {
 		// 加载手写的分析表
@@ -62,7 +62,7 @@ public class SyntaxAnalyzer {
 		for (Token token : tokens) {
 			if (token.type != TokenType.ERROR && token.type != TokenType.COMMENT) {
 				try {
-					isAccepted = move(stack.peek(), token);
+					isAccepted = move(stack.peek(), token); // 状态机尝试转换
 				} catch (Exception e) {
 					if (e.getMessage() == null) {
 						e.printStackTrace();
@@ -115,7 +115,7 @@ public class SyntaxAnalyzer {
 		new DFALoader().generateDFA();
 		LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer();
 		SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer("分析表.txt", "syntax.txt");
-		List<Token> tokens = lexicalAnalyzer.analyzeAsSQL(SLUtil.readFile("input.txt"));
-		syntaxAnalyzer.analyzeAsSQL(tokens);
+		List<Token> tokens = lexicalAnalyzer.analyzeAsSQL(SLUtil.readFile("input.txt"));    // 词法分析
+		syntaxAnalyzer.analyzeAsSQL(tokens);    // 语法分析
 	}
 }
