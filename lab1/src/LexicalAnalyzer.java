@@ -11,7 +11,7 @@ public class LexicalAnalyzer {
 	private final static String END_SYMBOL = "∅";   // 结束标记
 	private List<String> sqlPreservedWords = new ArrayList<>(); // SQL保留字集合
 
-	private LexicalAnalyzer() {
+	LexicalAnalyzer() {
 		String[] words = SLUtil.readFile("sql_preserved_words.txt").split("\r\n| |\n");
 		sqlPreservedWords.addAll(Arrays.asList(words));
 	}
@@ -22,7 +22,7 @@ public class LexicalAnalyzer {
 	 * @param input SQL语句
 	 * @return 分析结果序列
 	 */
-	private List<Token> analyzeAsSQL(String input) {
+	List<Token> analyzeAsSQL(String input) {
 		DFA dfa = DFALoader.loadDFA();
 		assert dfa != null;
 

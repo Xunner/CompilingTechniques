@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
  * @author 巽
  **/
 class SLUtil {
-	private final static String PATH = "." + File.separator + "resources" + File.separator;
+	private final static String PATH = "." + File.separator + "lab2" + File.separator + "resources" + File.separator;
 
 	/**
 	 * 读取文本，默认编码UTF-8

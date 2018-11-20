@@ -1,0 +1,16 @@
+S'→S
+S→S ; S
+S→select N from T
+S→select N from T where C
+N→N , N
+N→i . i
+N→i ( i )
+N→i
+C→C and C
+C→C or C
+C→D op D
+D→str|i|num
+B→asc|desc
+T→T , T
+T→i i
+T→i
